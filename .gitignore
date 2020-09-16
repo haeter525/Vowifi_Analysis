@@ -1,0 +1,16 @@
+# vscode
+.vscode
+
+# python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# dataset
+Dataset/*
+
+# pcap file
+Wireshark_pkt/*
+
+# model
+Model/*
