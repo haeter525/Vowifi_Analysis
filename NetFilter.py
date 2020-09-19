@@ -2,6 +2,7 @@
 # imports
 import scapy.layers.inet
 import scapy.all
+import socket
 import ipaddress
 import joblib
 
@@ -10,7 +11,7 @@ import lib.Direction
 
 # %%
 # 讀取訓練模型檔案
-modelFile = 'Model/VowifiParser_preFinal.joblib'
+modelFile = 'Model/VowifiParser_retrained.joblib'
 
 print('讀取模型...', end='')
 trained_clf = joblib.load(modelFile)
@@ -57,12 +58,80 @@ def analyize_packet(packet):
     else:
         print(f'{index:>3}\t{display_direct}\t{display_len}')
 
+    if vowifi_event == BLOCK_EVENT:
+        print('Blocking...')
+        input('Press Enter to Continue.')
+            
+# RUN_TYPE = 'PCAP'
+RUN_TYPE = 'RT'
+
+BLOCK_EVENT = None
+
+event_input = input('Block Event(index)')
+if event_input != '':
+    index = int(event_input)
+    assert index > 0 and index < len(lib.Event.EVENT_NAMES)
+    BLOCK_EVENT = index
+
+print(f'Block Event: {BLOCK_EVENT if BLOCK_EVENT is None else lib.Event.EVENT_NAMES[index]}')
+print('')
 
 assert(('trained_clf' in globals()), "先讀取模型！")
-print('Index\tDir\tLength\tTransfrom')
-scapy.all.sniff(
-    offline='Wireshark_pkt/Wifi連線_接起/Wifi_110to240_VOICE_1637_tidyup.pcap',
-    prn=analyize_packet,
-    store=0
-)
+
+if RUN_TYPE != 'RT':
+    print('Index\tDir\tLength\tTransfrom')
+    scapy.all.sniff(
+        offline='Wireshark_pkt/Wifi連線_接起/Wifi_110to240_VOICE_1637_tidyup.pcap',
+        prn=analyize_packet,
+        store=0
+    )
+else:
+    serversocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    serversocket.bind(('127.0.0.1', 11223))
+
+    scapysocket = scapy.supersocket.StreamSocket(serversocket)
+
+    #Start up
+    print('Wait for connection...', end='\r')
+    try:
+        while True:
+            pkt = scapysocket.recv()
+            if (pkt.haslayer(scapy.layers.inet.IP)):
+                ip = pkt.getlayer(scapy.layers.inet.IP)
+                ip_src = ipaddress.IPv4Address(ip.src)
+
+                ip.src = str(UE_ADDRESS)
+                scapy.all.send(pkt)
+                if (ip_src == UE_ADDRESS) or (ip_src == EPDG_ADDRESS):
+                    break
+
+    except KeyboardInterrupt as e:
+        print('Interruptted by user.')
+
+    print('Start scanning...')
+    print('Index\tDir\tLength\tTransfrom')
+    try:
+        while True:
+            # print('Listening...', end='\r')
+            pkt = scapysocket.recv()
+            analyize_packet(pkt)
+
+            if pkt.haslayer(scapy.layers.inet.IP):
+                ip = pkt.getlayer(scapy.layers.inet.IP)
+                
+                ip_dst = ipaddress.IPv4Address(ip.src)
+                if ip_dst == UE_ADDRESS:
+                    ip.dst = str(EPDG_ADDRESS)
+                elif ip_dst == EPDG_ADDRESS:
+                    ip.dst = str(UE_ADDRESS)
+
+                ip.dst = '8.8.8.8'
+
+            pkt.show()
+
+            scapy.all.send(pkt)
+    except KeyboardInterrupt as e:
+        pass
+    finally:
+        serversocket.close()
 # %%
