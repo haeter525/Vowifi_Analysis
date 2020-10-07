@@ -127,3 +127,15 @@ print(test_y)
 trained_clf.score(test_x, test_y)
 
 # %%
+# 模型轉換成為 Java code
+class_name = 'StateTracer'
+method_name = 'nextState'
+
+porter = sklearn_porter.Porter(trained_clf, language='Java')
+output = porter.export(class_name, method_name)
+
+f = open(class_name + '.java', 'w')
+f.write(output)
+f.close()
+print('完成！')
+# %%
