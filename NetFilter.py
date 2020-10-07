@@ -139,7 +139,7 @@ def run_in_realtime(queue_num, callback):
     finally:
         nfqueue.unbind()
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     print('讀取模型...', end='')
     set_model('Model/VowifiParser_retrained.joblib')
     print('完成！')

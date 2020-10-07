@@ -4,7 +4,7 @@ import random
 import time
 from socket import *
 
-remote_ip = "127.0.0.1"
+remote_ip = '127.0.0.1'
 remote_port = 11223
 
 # Create a UDP socket
@@ -18,7 +18,7 @@ while True:
     # Generate random number in the range of 0 to 10
     rand = random.randint(0, 10)
 
-    print(f"Send {rand}")
+    print(f'Send {rand}')
     message = rand.to_bytes(5, 'big')
 
     serverSocket.sendto(message, (remote_ip, remote_port))

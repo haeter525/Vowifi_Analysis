@@ -32,9 +32,9 @@ def main(pcap_file, index, output, verbose, ue, epdg):
         output_name = os.path.splitext(os.path.basename(pcap_file.name))[0] + '.png'
         output = open(output_name, 'w')
 
-    data = {"Timestamp":[], "Upward/Downward":[], "Length":[], "Event":[]}
+    data = {'Timestamp':[], 'Upward/Downward':[], 'Length':[], 'Event':[]}
     
-    espiter = EspIter(pcap_file, file=sys.stderr if verbose else open(os.devnull,"w"))
+    espiter = EspIter(pcap_file, file=sys.stderr if verbose else open(os.devnull,'w'))
     
     addr_ue = ipaddress.ip_address(ue)
     addr_epdg = ipaddress.ip_address(epdg)
@@ -55,24 +55,24 @@ def main(pcap_file, index, output, verbose, ue, epdg):
             continue
 
         #Record this packet 
-        data["Timestamp"] += [timestamp]
-        data["Upward/Downward"] += [ Direction.UPWARD.value if addr_src==addr_ue else Direction.DOWNWARD.value ]
+        data['Timestamp'] += [timestamp]
+        data['Upward/Downward'] += [ Direction.UPWARD.value if addr_src==addr_ue else Direction.DOWNWARD.value ]
         udp = pktlist[2]
-        data["Length"] += [ udp.ulen ]
+        data['Length'] += [ udp.ulen ]
 
         print( f'[{ind}]-[{timestamp}] length {udp.ulen} recorded.')
 
-    number_packet = len(data["Length"])
-    print(f"Finish Scanning. Total packet recorded: {number_packet}")
+    number_packet = len(data['Length'])
+    print(f'Finish Scanning. Total packet recorded: {number_packet}')
 
-    print(f"Output file: {output.name}")
-    print("Saving...")
+    print(f'Output file: {output.name}')
+    print('Saving...')
 
 
     upward = {'Timestamp':[], 'Length':[]}
     downward = {'Timestamp':[], 'Length':[]}
     for index in range(len(data['Length'])) :
-        if data["Upward/Downward"][index] == Direction.UPWARD.value:
+        if data['Upward/Downward'][index] == Direction.UPWARD.value:
             upward['Timestamp'] += [data['Timestamp'][index]]
             upward['Length'] += [data['Length'][index]]
         else :
@@ -83,8 +83,8 @@ def main(pcap_file, index, output, verbose, ue, epdg):
     print(len(upward['Length']))
     print(len(downward['Length']))
     
-    plt.plot(upward['Timestamp'], upward['Length'], marker = "o", color='blue')
-    plt.plot(downward['Timestamp'], downward['Length'], marker = "x", color='red')
+    plt.plot(upward['Timestamp'], upward['Length'], marker = 'o', color='blue')
+    plt.plot(downward['Timestamp'], downward['Length'], marker = 'x', color='red')
     
     if len(upward['Timestamp'])==0 and len(downward['Timestamp'])==0 :
         pass
@@ -101,12 +101,12 @@ def main(pcap_file, index, output, verbose, ue, epdg):
     plt.xticks(numpy.arange(start, end+1, 1.0)) 
 
     plt.savefig(output.name, dpi=100.0)
-    print("Down.")
+    print('Down.')
 
 def checkIp(ip, addr_ue, addr_epdg):
         addr_src = ipaddress.ip_address(ip.src)
         addr_dst = ipaddress.ip_address(ip.dst)
         return (addr_src == addr_ue and addr_dst == addr_epdg) or (addr_dst == addr_ue and addr_src == addr_epdg)       
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
