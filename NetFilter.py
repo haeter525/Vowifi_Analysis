@@ -10,7 +10,7 @@ import lib.Direction
 
 INDEX = 0
 CURRENT_STATE = lib.Event.Event.NONE.value
-BLOCK_EVENTS = None
+BLOCK_EVENT = None
 
 BLOCK_CONNECT = False
 
@@ -19,8 +19,8 @@ def show_info():
     print(f'UE_IP:\t{str(UE_ADDRESS)}')
     print(f'EPDG_IP:\t{str(EPDG_ADDRESS)}')
 
-    if not BLOCK_EVENTS is None:
-        print(f'BLOCK_ON: {[ lib.Event.EVENT_NAMES[i] for i in BLOCK_EVENTS ]}')
+    if not BLOCK_EVENT is None:
+        print(f'BLOCK_ON: {lib.Event.EVENT_NAMES[BLOCK_EVENT]}')
 
 def start_blocking():
     global BLOCK_CONNECT
@@ -47,12 +47,15 @@ def _rt_anlyize(nf_packet):
         return
 
     # Does the target state meet
-    if (_st_anlyize(pkt) == True) and (not (BLOCK_EVENTS is None)) and (CURRENT_STATE in BLOCK_EVENTS) :
+    if (_core_anlyize(pkt) == True) and (not (BLOCK_EVENT is None)) and (CURRENT_STATE >= BLOCK_EVENT) :
         on_target_state(CURRENT_STATE, nf_packet)
     else:
         nf_packet.accept()
 
 def _st_anlyize(scapy_packet):
+    _core_anlyize(scapy_packet)
+
+def _core_anlyize(scapy_packet):
     global INDEX, CURRENT_STATE
     UP_VAL = lib.Direction.Direction.UPWARD.value
     DOWN_VAL = lib.Direction.Direction.DOWNWARD.value
@@ -105,14 +108,13 @@ def set_model(model_file):
     global trained_clf
     trained_clf = joblib.load(model_file)
 
-def set_block_event(index_list):
-    global BLOCK_EVENTS
-    if index_list is None:
-        BLOCK_EVENTS = None
+def set_block_event(index):
+    global BLOCK_EVENT
+    if index is None:
+        BLOCK_EVENT = None
     else:
-        for i in index_list:
-            assert( i in range(len(lib.Event.EVENT_NAMES)) )
-        BLOCK_EVENTS = index_list
+        assert( index < len(lib.Event.EVENT_NAMES) )
+        BLOCK_EVENT = index
 
 def set_addresses(ue_addr, epdg_addr):
     global UE_ADDRESS
@@ -150,7 +152,7 @@ if __name__ == '__main__':
     RUN_TYPE = 'RT'
     # RUN_TYPE = 'TEST'
 
-    set_block_event([8])
+    set_block_event(12)
 
     print('')
     show_info()
