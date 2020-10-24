@@ -92,7 +92,7 @@ joblib.dump(trained_clf, modelFile)
 
 # %%
 # 讀取訓練模型檔案
-modelFile = 'Model/VowifiParser_retrained.joblib'
+modelFile = 'Model/VowifiParser_Final.joblib'
 trained_clf = joblib.load(modelFile)
 print('完成！')
 

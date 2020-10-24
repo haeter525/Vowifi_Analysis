@@ -143,7 +143,7 @@ def run_in_realtime(queue_num, callback):
 
 if __name__ == '__main__':
     print('讀取模型...', end='')
-    set_model('Model/VowifiParser_retrained.joblib')
+    set_model('Model/VowifiParser_Final.joblib')
     print('完成！')
 
     set_addresses('10.42.0.110', '221.120.23.1')
@@ -161,6 +161,6 @@ if __name__ == '__main__':
     if RUN_TYPE == 'RT':
         run_in_realtime(1, _rt_anlyize)
     elif RUN_TYPE == 'PCAP':
-        pcap_file = input('輸入 Pcap 檔案位置:')
+        pcap_file = 'Wireshark_pkt/110to240_NonAnswering_tidyup.pcap'
         run_on_pcap(pcap_file, _st_anlyize)
 

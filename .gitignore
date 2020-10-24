@@ -14,3 +14,4 @@ Wireshark_pkt/*
 
 # model
 Model/*
+!Model/VowifiParser_Final.joblib
