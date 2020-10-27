@@ -8,6 +8,8 @@ import netfilterqueue
 import lib.Event
 import lib.Direction
 
+import CustomTree
+
 INDEX = 0
 CURRENT_STATE = lib.Event.Event.NONE.value
 BLOCK_EVENT = None
@@ -108,6 +110,10 @@ def set_model(model_file):
     global trained_clf
     trained_clf = joblib.load(model_file)
 
+def init_custom_tree():
+    global trained_clf
+    trained_clf = CustomTree.StateTree()
+
 def set_block_event(index):
     global BLOCK_EVENT
     if index is None:
@@ -142,15 +148,24 @@ def run_in_realtime(queue_num, callback):
         nfqueue.unbind()
 
 if __name__ == '__main__':
+    RUN_TYPE = 'PCAP'
+    # RUN_TYPE = 'RT'
+    # RUN_TYPE = 'TEST'
+
+    # TREE_TYPE = 'TRAINED'
+    TREE_TYPE = 'CUSTOM'
+
+    if TREE_TYPE == 'TRAINED':
     print('讀取模型...', end='')
-    set_model('Model/VowifiParser_Final.joblib')
+        set_model('Model/VowifiParser_v1026095919.joblib')
+        print('完成！')
+    elif TREE_TYPE == 'CUSTOM':
+        print('自建決策樹...', end='')
+        init_custom_tree()
     print('完成！')
 
     set_addresses('10.42.0.110', '221.120.23.1')
 
-    # RUN_TYPE = 'PCAP'
-    RUN_TYPE = 'RT'
-    # RUN_TYPE = 'TEST'
 
     set_block_event(12)
 
