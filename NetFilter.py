@@ -12,6 +12,12 @@ import CustomTree
 
 INDEX = 0
 CURRENT_STATE = lib.Event.Event.NONE.value
+
+MAX_STAIR = None
+STEP = None
+FLOORS = [lib.Event.Event.NONE.value, lib.Event.Event.RINGING6.value, lib.Event.Event.VOICE11.value]
+CURRENT_FLOOR = None
+
 BLOCK_EVENT = None
 
 BLOCK_CONNECT = False
@@ -58,7 +64,7 @@ def _st_anlyize(scapy_packet):
     _core_anlyize(scapy_packet)
 
 def _core_anlyize(scapy_packet):
-    global INDEX, CURRENT_STATE
+    global INDEX, CURRENT_STATE, STEP, CURRENT_FLOOR
     UP_VAL = lib.Direction.Direction.UPWARD.value
     DOWN_VAL = lib.Direction.Direction.DOWNWARD.value
 
@@ -97,10 +103,22 @@ def _core_anlyize(scapy_packet):
 
     if CURRENT_STATE != next_state:
         dp_event = next_state
-        print(f'\t-> {dp_event}')
-    else:
-        print('')
+        print(f'\t-> {dp_event}', end='')
 
+        STEP = MAX_STAIR
+        for i in range(len(FLOORS)):
+            if next_state == FLOORS[i]:
+                CURRENT_FLOOR = i
+                
+    elif (MAX_STAIR is not None) and (next_state != FLOORS[CURRENT_FLOOR]):
+        STEP = STEP - 1
+        if STEP==0:
+            next_state = FLOORS[CURRENT_FLOOR]
+            print(f'\ttimeout -> {next_state}',end='')
+            STEP = MAX_STAIR
+
+    print('')
+                
     # Update state
     CURRENT_STATE = next_state
 
@@ -113,6 +131,11 @@ def set_model(model_file):
 def init_custom_tree():
     global trained_clf
     trained_clf = CustomTree.StateTree()
+
+    global MAX_STAIR, STEP, CURRENT_FLOOR
+    MAX_STAIR = 8
+    STEP = MAX_STAIR
+    CURRENT_FLOOR = 0
 
 def set_block_event(index):
     global BLOCK_EVENT
@@ -156,7 +179,7 @@ if __name__ == '__main__':
     TREE_TYPE = 'CUSTOM'
 
     if TREE_TYPE == 'TRAINED':
-    print('讀取模型...', end='')
+        print('讀取模型...', end='')
         set_model('Model/VowifiParser_v1026095919.joblib')
         print('完成！')
     elif TREE_TYPE == 'CUSTOM':
@@ -176,6 +199,6 @@ if __name__ == '__main__':
     if RUN_TYPE == 'RT':
         run_in_realtime(1, _rt_anlyize)
     elif RUN_TYPE == 'PCAP':
-        pcap_file = 'Wireshark_pkt/110to240_NonAnswering_tidyup.pcap'
+        pcap_file = 'Wireshark_pkt/Wifi連線_接起/Wifi_110to240_VOICE_1651_tidyup.pcap'
         run_on_pcap(pcap_file, _st_anlyize)
 
