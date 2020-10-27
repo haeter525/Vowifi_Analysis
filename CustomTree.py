@@ -24,7 +24,7 @@ class StateTree(object):
         next_state = None
 
         if old_state == Event.NONE.value:
-            # None -> Invite
+            # Area1
 
             if dir == Direction.UPWARD.value:
                 if 800 < len < 1300:
@@ -32,7 +32,6 @@ class StateTree(object):
 
             else : # DOWNWARD
                 pass
-
             
         elif old_state == Event.INVITE1.value:
 
@@ -85,14 +84,15 @@ class StateTree(object):
                     return Event.RINGING6.value
 
         elif old_state == Event.RINGING6.value:
+            # Area2
 
             if dir == Direction.UPWARD.value:
-                if len < 250:
-                    return Event.RINGING6.value
+                if 800 < len < 1300:
+                    return Event.PRACK7.value
 
             else : # DOWNWARD
-                if len < 250:
-                    return Event.RINGING6.value
+                if 400 < len < 1000:
+                    return Event.PRACK7.value
 
         elif old_state == Event.PRACK7.value:
 
@@ -100,61 +100,53 @@ class StateTree(object):
                 pass
 
             else : # DOWNWARD
-                pass
+                if len > 250:
+                    return Event.OK8.value
 
         elif old_state == Event.OK8.value:
-        # None -> Invite
-
+        
             if dir == Direction.UPWARD.value:
-                pass
+                if 400 < len < 1000:
+                    return Event.ACK10.value
 
             else : # DOWNWARD
-                pass
+                if 400 < len < 1000:
+                    return Event.OK9.value
 
         elif old_state == Event.OK9.value:
-        # None -> Invite
-
+        
             if dir == Direction.UPWARD.value:
-                pass
+                if 400 < len < 1000:
+                    return Event.ACK10.value
 
             else : # DOWNWARD
                 pass
 
         elif old_state == Event.ACK10.value:
-        # None -> Invite
-
+        
             if dir == Direction.UPWARD.value:
-                pass
+                if len < 250:
+                    return Event.VOICE11.value
 
             else : # DOWNWARD
-                pass
+                if len < 250:
+                    return Event.VOICE11.value
 
         elif old_state == Event.VOICE11.value:
-        # None -> Invite
-
-            if dir == Direction.UPWARD.value:
-                pass
-
-            else : # DOWNWARD
-                pass
+        # Area3
+        
+            if len > 250:
+                return Event.BYE12.value
 
         elif old_state == Event.BYE12.value:
-        # None -> Invite
 
-            if dir == Direction.UPWARD.value:
-                pass
-
-            else : # DOWNWARD
-                pass
+            if len > 250:
+                return Event.OK13.value
 
         elif old_state == Event.OK13.value:
-        # None -> Invite
-
-            if dir == Direction.UPWARD.value:
-                pass
-
-            else : # DOWNWARD
-                pass
+            
+            if len < 250:
+                return Event.NONE.value
 
         return old_state
     
