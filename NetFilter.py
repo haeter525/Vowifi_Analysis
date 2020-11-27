@@ -79,8 +79,6 @@ def _core_anlyize(scapy_packet):
 
     # Check for Length
     pkt_len = len(scapy_packet) + 14
-    if pkt_len < 190:
-        return False
     pkt_input[1] = pkt_len
 
     # Check for ip

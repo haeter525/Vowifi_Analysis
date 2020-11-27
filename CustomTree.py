@@ -12,7 +12,7 @@ class StateTree(object):
     def next_state(self, direct, length, old_state):
         if direct != Direction.UPWARD.value and direct != Direction.DOWNWARD:
             raise f"Illage direction {direct}, use Enum lib.Direction."
-        
+
         return predict([direct.value, length, old_state])
 
     def predict(self, data):
@@ -27,7 +27,7 @@ class StateTree(object):
             # Area1
 
             if dir == Direction.UPWARD.value:
-                if 800 < len < 1300:
+                if 800 < len < 1500:
                     return Event.INVITE1.value
 
             else : # DOWNWARD
@@ -47,31 +47,31 @@ class StateTree(object):
         elif old_state == Event.TRYING2.value:
 
             if dir == Direction.UPWARD.value:
-                if 800 < len < 1300:
+                if 800 < len < 1500:
                     return Event.PRACK4.value
 
             else : # DOWNWARD
-                if 800 < len < 1300:
+                if 800 < len < 1500:
                     return Event.SESSION3.value
 
         elif old_state == Event.SESSION3.value:
 
             if dir == Direction.UPWARD.value:
-                if 800 < len < 1300:
+                if 800 < len < 1500:
                     return Event.PRACK4.value
 
             else : # DOWNWARD
-                if 500 < len < 1300:
+                if 500 < len < 1500:
                     return Event.OK5.value
 
         elif old_state == Event.PRACK4.value:
 
             if dir == Direction.UPWARD.value:
-                if 250 < len < 1300:
+                if 250 < len < 1500:
                     return Event.OK5.value
 
             else : # DOWNWARD
-                if 250 < len < 1300:
+                if 250 < len < 1500:
                     return Event.OK5.value
 
         elif old_state == Event.OK5.value:
@@ -87,11 +87,11 @@ class StateTree(object):
             # Area2
 
             if dir == Direction.UPWARD.value:
-                if 800 < len < 1300:
+                if 800 < len < 1500:
                     return Event.PRACK7.value
 
             else : # DOWNWARD
-                if 400 < len < 1000:
+                if 400 < len < 1500:
                     return Event.PRACK7.value
 
         elif old_state == Event.PRACK7.value:
